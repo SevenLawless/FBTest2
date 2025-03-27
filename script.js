@@ -602,10 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
             openInBrowserBtn.className = 'mobile-only-btn';
             
             // Check if user is coming from Facebook
-            const isFromFacebook = 
-                navigator.userAgent.indexOf('FBAN') !== -1 || 
-                navigator.userAgent.indexOf('FBAV') !== -1 || 
-                navigator.userAgent.indexOf('Instagram') !== -1;
+            const isFromFacebook = isFacebookBrowser();
             
             // Make button more prominent for Facebook users
             if (isFromFacebook) {
@@ -625,12 +622,61 @@ document.addEventListener('DOMContentLoaded', () => {
                     'value': 1
                 });
                 
-                // Open current URL in new tab to trigger Facebook browser prompt
-                window.open(window.location.href, '_blank');
+                // Try multiple methods to open in external browser
+                tryOpenInExternalBrowser();
             });
             
             // Insert after the download button
             downloadCertificateBtn.parentNode.insertBefore(openInBrowserBtn, downloadCertificateBtn.nextSibling);
+        }
+    }
+    
+    // Function to detect Facebook browser
+    function isFacebookBrowser() {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        return (userAgent.indexOf("FBAN") > -1) || 
+               (userAgent.indexOf("FBAV") > -1) || 
+               (userAgent.indexOf("Instagram") > -1);
+    }
+    
+    // Function to try multiple methods to open in external browser
+    function tryOpenInExternalBrowser() {
+        // Method 1: Using window.open with _blank
+        try {
+            window.open(window.location.href, '_blank');
+        } catch (e) {
+            console.log('Method 1 failed, trying method 2...');
+            
+            // Method 2: Create and click a link
+            try {
+                const link = document.createElement('a');
+                link.href = window.location.href;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                document.body.appendChild(link);
+                link.click();
+                setTimeout(() => {
+                    try {
+                        document.body.removeChild(link);
+                    } catch(e) { 
+                        // Ignore cleanup errors
+                    }
+                }, 100);
+            } catch (e) {
+                console.log('Method 2 failed, trying method 3...');
+                
+                // Method 3: location.href with special parameter
+                try {
+                    // Add a parameter to avoid infinite loops
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('external', 'true');
+                    window.location.href = url.toString();
+                } catch (e) {
+                    console.log('All methods failed');
+                    // Show message to user
+                    alert('يرجى النقر على الرابط في الأعلى لفتح الموقع في المتصفح الخارجي');
+                }
+            }
         }
     }
 

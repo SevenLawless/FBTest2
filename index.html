@@ -15,6 +15,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>اصنع شهادة تقدير لطفلك الصائم</title>
+    
+    <!-- Facebook browser detection and handling -->
+    <script>
+      function isFacebookBrowser() {
+        var ua = navigator.userAgent || navigator.vendor || window.opera;
+        return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1);
+      }
+
+      // If coming from a Facebook browser without the external parameter, add a visible button at the top of the page
+      if (isFacebookBrowser() && !window.location.href.includes('external=true')) {
+        // Don't do anything automatic - just prepare for adding notice
+        window.isFacebookBrowser = true;
+      }
+      
+      // Check if this is an external=true request (which means we're trying to break out of Facebook)
+      if (window.location.href.includes('external=true')) {
+        // This is our breakout attempt - additional handling is done in the body
+        window.isExternalAttempt = true;
+      }
+    </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
@@ -138,7 +158,7 @@
           // Add a small notice at the top of the page
           var notice = document.createElement('div');
           notice.className = 'facebook-browser-notice';
-          notice.innerHTML = '<strong>تنبيه:</strong> أنت تستخدم متصفح فيسبوك الداخلي. للحصول على تجربة أفضل في تنزيل وحفظ الشهادة، استخدم زر "فتح في المتصفح الخارجي" بعد إنشاء الشهادة.';
+          notice.innerHTML = '<strong>تنبيه:</strong> أنت تستخدم متصفح فيسبوك الداخلي. للحصول على تجربة أفضل في تنزيل وحفظ الشهادة، <a href="' + window.location.href + '" target="_blank" rel="noopener noreferrer" style="color: #0066cc; text-decoration: underline; font-weight: bold;">انقر هنا لفتح الموقع في متصفح خارجي</a>.';
           
           // Insert at the top of the main content
           var main = document.querySelector('main');
@@ -156,7 +176,7 @@
                 reminder.id = 'fb-preview-reminder';
                 reminder.className = 'facebook-browser-notice';
                 reminder.style.marginTop = '15px';
-                reminder.innerHTML = 'للحصول على أفضل تجربة، استخدم زر "فتح في المتصفح الخارجي (موصى به)" أدناه';
+                reminder.innerHTML = 'للحصول على أفضل تجربة، <a href="' + window.location.href + '" target="_blank" rel="noopener noreferrer" style="color: #0066cc; text-decoration: underline; font-weight: bold;">انقر هنا</a> أو استخدم زر "فتح في المتصفح الخارجي" أدناه';
                 
                 // Add after the certificate container
                 var container = document.getElementById('certificateContainer');
@@ -166,6 +186,37 @@
               }
             }, { once: true });
           }
+        }
+      });
+    </script>
+    
+    <!-- Handle external parameter -->
+    <script>
+      // This script handles the special external=true parameter
+      // It helps break out of the Facebook browser
+      document.addEventListener('DOMContentLoaded', function() {
+        // If this is the external=true URL and we're still in Facebook browser
+        if (window.isExternalAttempt && isFacebookBrowser()) {
+          // We're still in Facebook, add an urgent notice at the top
+          var urgentNotice = document.createElement('div');
+          urgentNotice.className = 'facebook-browser-urgent-notice';
+          urgentNotice.style.backgroundColor = '#f8d7da';
+          urgentNotice.style.color = '#721c24';
+          urgentNotice.style.padding = '15px';
+          urgentNotice.style.marginBottom = '20px';
+          urgentNotice.style.borderRadius = '5px';
+          urgentNotice.style.textAlign = 'center';
+          urgentNotice.style.fontSize = '18px';
+          urgentNotice.style.borderRight = '5px solid #f5c6cb';
+          
+          // Add multiple direct links with different methods
+          urgentNotice.innerHTML = '<strong>يرجى اختيار إحدى الخيارات التالية لفتح الموقع في متصفح خارجي:</strong><br><br>' +
+                                   '<a href="' + window.location.origin + window.location.pathname + '" target="_blank" style="display:block; margin:10px 0; padding:10px; background-color:#007bff; color:white; text-decoration:none; border-radius:5px;">1. فتح في المتصفح الافتراضي</a>' +
+                                   '<a href="https://' + window.location.host + window.location.pathname + '" target="_system" style="display:block; margin:10px 0; padding:10px; background-color:#28a745; color:white; text-decoration:none; border-radius:5px;">2. فتح في متصفح النظام</a>' +
+                                   '<a href="intent://' + window.location.host + window.location.pathname + '#Intent;scheme=https;package=com.android.chrome;end" style="display:block; margin:10px 0; padding:10px; background-color:#6c757d; color:white; text-decoration:none; border-radius:5px;">3. فتح في متصفح كروم (أندرويد)</a>';
+          
+          // Insert at the top of the page
+          document.body.insertBefore(urgentNotice, document.body.firstChild);
         }
       });
     </script>
