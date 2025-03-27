@@ -127,5 +127,47 @@
         }
       });
     </script>
+    
+    <!-- Add a helper message for Facebook users -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Check if user is likely coming from Facebook 
+        if (navigator.userAgent.indexOf('FBAN') !== -1 || 
+            navigator.userAgent.indexOf('FBAV') !== -1 || 
+            navigator.userAgent.indexOf('Instagram') !== -1) {
+          // Add a small notice at the top of the page
+          var notice = document.createElement('div');
+          notice.className = 'facebook-browser-notice';
+          notice.innerHTML = '<strong>تنبيه:</strong> أنت تستخدم متصفح فيسبوك الداخلي. للحصول على تجربة أفضل في تنزيل وحفظ الشهادة، استخدم زر "فتح في المتصفح الخارجي" بعد إنشاء الشهادة.';
+          
+          // Insert at the top of the main content
+          var main = document.querySelector('main');
+          if (main && main.firstChild) {
+            main.insertBefore(notice, main.firstChild);
+          }
+          
+          // Also add a reminder near the certificate preview
+          var certificatePreview = document.getElementById('certificatePreview');
+          if (certificatePreview) {
+            certificatePreview.addEventListener('DOMNodeInserted', function() {
+              // Check if we already added the reminder
+              if (!document.getElementById('fb-preview-reminder')) {
+                var reminder = document.createElement('div');
+                reminder.id = 'fb-preview-reminder';
+                reminder.className = 'facebook-browser-notice';
+                reminder.style.marginTop = '15px';
+                reminder.innerHTML = 'للحصول على أفضل تجربة، استخدم زر "فتح في المتصفح الخارجي (موصى به)" أدناه';
+                
+                // Add after the certificate container
+                var container = document.getElementById('certificateContainer');
+                if (container && container.parentNode) {
+                  container.parentNode.insertBefore(reminder, container.nextSibling);
+                }
+              }
+            }, { once: true });
+          }
+        }
+      });
+    </script>
 </body>
 </html>

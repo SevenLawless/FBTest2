@@ -1144,3 +1144,30 @@ input[type="file"] {
         display: none;
     }
 }
+
+/* Facebook browser notice */
+.facebook-browser-notice {
+    background-color: #FFF3CD;
+    color: #856404;
+    padding: 10px 15px;
+    border-radius: 4px;
+    text-align: center;
+    margin: 10px auto;
+    max-width: 800px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    border-right: 4px solid #F6C23E;
+    animation: notice-fade-in 0.5s ease-in-out forwards;
+}
+
+@keyframes notice-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

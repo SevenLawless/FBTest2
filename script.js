@@ -600,23 +600,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const openInBrowserBtn = document.createElement('button');
             openInBrowserBtn.id = 'openInBrowserBtn';
             openInBrowserBtn.className = 'mobile-only-btn';
-            openInBrowserBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> فتح في المتصفح الخارجي';
+            
+            // Check if user is coming from Facebook
+            const isFromFacebook = 
+                navigator.userAgent.indexOf('FBAN') !== -1 || 
+                navigator.userAgent.indexOf('FBAV') !== -1 || 
+                navigator.userAgent.indexOf('Instagram') !== -1;
+            
+            // Make button more prominent for Facebook users
+            if (isFromFacebook) {
+                openInBrowserBtn.style.backgroundColor = '#4267B2'; // Facebook blue
+                openInBrowserBtn.style.fontSize = '18px';
+                openInBrowserBtn.style.padding = '15px';
+                openInBrowserBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> فتح في المتصفح الخارجي (موصى به)';
+            } else {
+                openInBrowserBtn.innerHTML = '<i class="fas fa-external-link-alt"></i> فتح في المتصفح الخارجي';
+            }
             
             openInBrowserBtn.addEventListener('click', () => {
-                // Convert canvas to blob URL
-                canvas.toBlob(function(blob) {
-                    const blobUrl = URL.createObjectURL(blob);
-                    
-                    // Track event
-                    gtag('event', 'open_in_external_browser', {
-                        'event_category': 'engagement',
-                        'event_label': 'Open In External Browser',
-                        'value': 1
-                    });
-                    
-                    // Open in new tab/window to trigger Facebook browser prompt
-                    window.open(blobUrl, '_blank');
+                // Track event
+                gtag('event', 'open_in_external_browser', {
+                    'event_category': 'engagement',
+                    'event_label': 'Open In External Browser',
+                    'value': 1
                 });
+                
+                // Open current URL in new tab to trigger Facebook browser prompt
+                window.open(window.location.href, '_blank');
             });
             
             // Insert after the download button
